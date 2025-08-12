@@ -49,4 +49,4 @@ Bu proje, **Ruby on Rails 7** kullanılarak geliştirilmiş, LinkedIn benzeri bi
 
 ---
 
-Teşekkürler!
+
