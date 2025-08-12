@@ -1,0 +1,7 @@
+<h1><%= @user.name %>'e Mesaj Gönder</h1>
+
+<%= form_with model: @message, url: messages_path, local: true do |form| %>
+  <%= form.hidden_field :receiver_id, value: @user.id %>
+  <%= form.text_area :content %>
+  <%= form.submit "Gönder" %>
+<% end %>

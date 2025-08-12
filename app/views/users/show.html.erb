@@ -1,0 +1,174 @@
+<div class="profile-container">
+  <div class="card profile-header">
+    <% if @user.avatar.attached? %>
+      <%= image_tag @user.avatar.variant(resize_to_limit: [120, 120]) %>
+    <% end %>
+    <div class="profile-info">
+      <h1><%= @user.name %></h1>
+      <p><strong>Meslek:</strong> <%= @user.title %></p>
+      <p><strong>Biografi:</strong> <%= @user.bio %></p>
+
+      <div class="button-group">
+        <% if @user == current_user %>
+          <%= link_to "Profili Düzenle", edit_user_path(@user), class: "btn btn-secondary" %>
+          <%= link_to "Mesaj Kutum", my_messages_path, class: "btn btn-primary" %>
+        <% else %>
+          <%= link_to "Mesaj Gönder", new_message_path(user_id: @user.id), class: "btn btn-primary" %>
+        <% end %>
+        <%= link_to "← Ana Sayfa", root_path, class: "btn btn-secondary" %>
+      </div>
+    </div>
+  </div>
+
+  <% if @user == current_user && @pending_requests.present? %>
+    <div class="card notice-box">
+      <h4>Bekleyen Bağlantı İstekleri ( <%= @pending_requests.count %> )</h4>
+      <ul>
+        <% @pending_requests.each do |request| %>
+          <li>
+            <%= link_to request.user.name, user_path(request.user) %>
+            <%= button_to "Kabul Et", connection_path(request), method: :put, class: "btn btn-success btn-sm" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="card">
+    <% if @user == current_user  %>
+      <div class="button-group" style="margin-bottom: 15px;">
+        <%= link_to "➕ Post Ekle", new_post_path, class: "btn btn-success" %>
+      </div>
+    <% end %>
+
+    <h2>Postlar</h2>
+    <% @posts.each do |post| %>
+      <div class="post-card">
+        <p><strong><%= post.user.name %></strong>: <%= post.content %></p>
+        <small><%= time_ago_in_words(post.created_at) %> önce</small>
+
+        <% if current_user == post.user %>
+          <div class="button-group">
+            <%= link_to "Düzenle", edit_post_path(post), class: "btn btn-secondary" %>
+            <%= button_to "Sil", post_path(post), method: :delete, data: { confirm: "Silinsin mi?" }, class: "btn btn-danger" %>
+          </div>
+        <% end %>
+
+        <div class="button-group">
+          <% if post.likes.exists?(user: current_user) %>
+            <%= button_to "Beğeniyi Geri Al ❤️", post_like_path(post), method: :delete, class: "btn btn-secondary" %>
+          <% else %>
+            <%= button_to "Beğen ❤️", post_like_path(post), method: :post, class: "btn btn-primary" %>
+          <% end %>
+          <span><%= post.likes.count %> kişi beğendi</span>
+        </div>
+
+        <h4>Yorumlar</h4>
+        <% if post.comments.empty? %>
+          <p>Henüz yorum yok.</p>
+        <% end %>
+
+        <% post.comments.each do |comment| %>
+          <p><strong><%= comment.user.name %></strong>: <%= comment.content %></p>
+        <% end %>
+
+        <% if user_signed_in? %>
+          <%= form_with model: [post, Comment.new], local: true do |form| %>
+            <%= form.text_area :content, rows: 2, placeholder: "Yorum ekle..." %><br>
+            <%= form.submit "Gönder", class: "btn btn-primary" %>
+          <% end %>
+        <% else %>
+          <p>Yorum yapmak için <%= link_to "giriş yap", new_session_path %>.</p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% unless @user == current_user %>
+    <div class="card">
+      <% connection = current_user.connections.find_by(friend: @user) || @user.connections.find_by(friend: current_user) %>
+
+      <% if connection.nil? %>
+        <%= button_to "Bağlantı Gönder", connections_path(friend_id: @user.id), method: :post, class: "btn btn-primary" %>
+
+      <% elsif connection.status == "pending" %>
+        <% if connection.user == current_user %>
+          <p>Bağlantı isteği gönderildi.</p>
+        <% else %>
+          <%= button_to "Kabul Et", connection_path(connection), method: :put, class: "btn btn-success" %>
+        <% end %>
+
+      <% elsif connection.status == "accepted" %>
+        <p>Zaten bağlantıdasınız.</p>
+        <%= button_to "Bağlantıyı Kaldır", connection_path(connection), method: :delete, class: "btn btn-danger", data: { confirm: "Silmek istediğine emin misin?" } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Css ile oluşturduğum front -->
+<style>
+  .profile-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f4f6f9;
+    font-family: "Segoe UI", sans-serif;
+  }
+
+  .card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  }
+
+  .profile-header {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .profile-header img {
+    border-radius: 8px;
+    max-width: 120px;
+    max-height: 120px;
+  }
+
+  .profile-info h1 {
+    margin: 0;
+  }
+
+  .button-group {
+    margin-top: 10px;
+  }
+
+  .btn {
+    padding: 6px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+    margin-right: 8px;
+  }
+
+  .btn-primary { background: #007bff; color: white; }
+  .btn-secondary { background: #e1e7ef; color: #333; }
+  .btn-success { background: #27ae60; color: white; }
+  .btn-danger { background: #c0392b; color: white; }
+
+  .post-card {
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+
+  .notice-box {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+  }
+</style>

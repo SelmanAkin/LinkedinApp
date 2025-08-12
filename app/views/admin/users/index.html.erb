@@ -1,0 +1,25 @@
+<h1>Admin Paneli: Kullanıcılar</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Ad</th>
+      <th>Email</th>
+      <th>Rol</th>
+      <th>İşlem</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.name %></td>
+        <td><%= user.email %></td>
+        <td><%= user.admin? ? "Admin" : "Kullanıcı" %></td>
+        <td>
+          <% unless user == current_user %>
+            <%= button_to "Sil", admin_user_path(user), method: :delete, data: { confirm: "Emin misin?" } %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

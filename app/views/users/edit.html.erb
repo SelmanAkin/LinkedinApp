@@ -1,0 +1,51 @@
+<h1>Profil Düzenle</h1>
+
+<%= form_tag user_path(@user), method: :patch, multipart: true do %>
+  <% if @user.errors.any? %>
+    <div style="color: red; margin-bottom: 20px;">
+      <h2><%= pluralize(@user.errors.count, "hata") %> bulundu:</h2>
+      <ul>
+        <% @user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div style="margin-bottom: 16px;">
+    <%= label_tag :name, "Ad Soyad", style: "display: block;" %>
+    <%= text_field_tag "user[name]", @user.name, required: true %>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <%= label_tag :title, "Ünvan", style: "display: block;" %>
+    <%= text_field_tag "user[title]", @user.title %>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <%= label_tag :bio, "Hakkında", style: "display: block;" %>
+    <%= text_area_tag "user[bio]", @user.bio, rows: 4 %>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <%= label_tag :avatar, "Profil Fotoğrafı Yükle", style: "display: block;" %>
+    <%= file_field_tag "user[avatar]", accept: "image/*" %>
+
+    <% if @user.avatar.attached? %>
+      <div id="avatar-preview" style="margin-top: 12px;">
+        <p><strong>Mevcut Avatar:</strong></p>
+        <%= image_tag @user.avatar.variant(resize_to_limit: [120, 120]), style: "border-radius: 50%; display: block; margin-bottom: 10px;" %>
+
+        <%= button_to "Güncelle", avatar_user_path(@user),
+              method: :delete,
+              form: { data: { turbo: true } },
+              data: { confirm: "Avatarı silmek istediğinizden emin misiniz?" },
+              class: "btn btn-danger" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <%= submit_tag "Güncelle", class: "btn btn-primary" %>
+  </div>
+<% end %>

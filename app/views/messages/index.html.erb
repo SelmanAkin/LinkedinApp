@@ -1,0 +1,95 @@
+<div class="messages-container">
+  <div class="message-section">
+    <h2>📥 Gelen Mesajlar</h2>
+    <% if @received.any? %>
+      <% @received.each do |msg| %>
+        <div class="message-card">
+          <div class="message-content">
+            <p><strong><%= msg.sender.name %></strong> → <%= msg.content %></p>
+            <div class="message-meta"><%= l(msg.created_at, format: :short) %></div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p>Henüz gelen mesajınız yok.</p>
+    <% end %>
+  </div>
+
+  <div class="message-section">
+    <h2>📤 Giden Mesajlar</h2>
+    <% if @sent.any? %>
+      <% @sent.each do |msg| %>
+        <div class="message-card">
+          <div class="message-content">
+            <p><strong>Sen</strong> → <%= msg.receiver.name %>: <%= msg.content %></p>
+            <div class="message-meta"><%= l(msg.created_at, format: :short) %></div>
+          </div>
+          <div>
+            <%= button_to "Sil", message_path(msg), method: :delete, data: { confirm: "Silmek istediğine emin misin?" }, class: "btn-delete" %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p>Henüz gönderdiğiniz mesaj yok.</p>
+    <% end %>
+  </div>
+</div>
+
+<!-- Css ile oluşturduğum front -->
+<style>
+  .messages-container {
+    max-width: 800px;
+    margin: 30px auto;
+    font-family: "Segoe UI", sans-serif;
+  }
+
+  .message-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+
+  .message-section h2 {
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .message-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 15px 20px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .message-content {
+    font-size: 15px;
+    color: #333;
+  }
+
+  .message-meta {
+    color: #666;
+    font-size: 13px;
+  }
+
+  .btn-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .btn-delete:hover {
+    background-color: #c82333;
+  }
+</style>

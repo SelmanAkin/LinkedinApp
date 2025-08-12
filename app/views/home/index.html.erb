@@ -1,0 +1,165 @@
+<% unless user_signed_in? %>
+  <div class="card" style="background-color:#fff3cd; border:1px solid #ffeeba; padding:10px; margin-bottom:20px;">
+    <strong>👋 Hoşgeldin!</strong> İçerikleri görüntüleyebilirsin ama bağlantı kurmak için Giriş yap lütfen.
+  </div>
+<% end %>
+
+<div class="container">
+  <div class="card">
+    <h2>✏️ Paylaşım Yap</h2>
+    <%= form_with model: @post, url: posts_path, local: true do |form| %>
+      <div class="form-group">
+        <%= form.text_area :content, placeholder: "Ne paylaşmak istersin?", rows: 4 %>
+      </div>
+      <%= form.submit "Paylaş" %>
+    <% end %>
+  </div>
+
+  <div class="card">
+    <h3>👥 Diğer Kullanıcılar</h3>
+    <% @users.each do |user| %>
+      <div class="user-card">
+        <p><%= user.name %> – <%= user.title %></p>
+        <%= link_to "👤 Profili Gör", user_path(user) %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card feed-card">
+    <h2>📰 Paylaşımlar</h2>
+    <% @feed_posts.each do |post| %>
+      <div class="post-card">
+        <p><strong><%= link_to post.user.name, user_path(post.user) %></strong> – <%= post.user.title %></p>
+        <p><%= post.content %></p>
+        <small><%= time_ago_in_words(post.created_at) %> ago</small>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Css ile oluşturduğum front -->
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f7fa;
+    color: #2c3e50;
+    line-height: 1.6;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card h2, .card h3 {
+    margin-top: 0;
+    color: #1a2b4c;
+    font-size: 21px;
+    border-bottom: 1px solid #dde5f1;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccd6e3;
+    background: #f8fbfd;
+    font-size: 15px;
+    resize: vertical;
+  }
+
+  input[type="submit"] {
+    background-color: #2563eb;
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  input[type="submit"]:hover {
+    background-color: #1e4fd5;
+  }
+
+  .post-card {
+    border-top: 1px solid #e2eaf3;
+    padding: 16px 0;
+    margin-bottom: 10px;
+  }
+
+  .post-card p {
+    margin: 4px 0;
+  }
+
+  .post-card small {
+    color: #7f8c8d;
+  }
+
+  .user-card {
+    border: 1px solid #e3eaf2;
+    background: #f9fbfd;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+
+  .user-card p {
+    margin: 0;
+  }
+
+  .user-card a {
+    display: inline-block;
+    margin-top: 8px;
+    color: #2563eb;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .user-card a:hover {
+    text-decoration: underline;
+  }
+
+  .no-data {
+    font-style: italic;
+    color: #7a8da1;
+    padding: 10px 0;
+  }
+
+  .feed-card {
+    grid-column: 1 / -1; /* Tam genişlik alır */
+  }
+
+  @media screen and (max-width: 768px) {
+    .container {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+  }
+</style>
